@@ -61,7 +61,8 @@ public class Aset implements DapatDipinjam {
         this.kondisi = kondisi;
     }
 
-    private static String wajibIsi(String nilai, String namaField) {
+      /** Dipakai juga oleh subclass agar aturan "tidak boleh kosong" hanya ditulis sekali. */
+    protected static String wajibIsi(String nilai, String namaField) {
         if (nilai == null || nilai.isBlank()) {
             throw new IllegalArgumentException(namaField + " tidak boleh null atau kosong");
         }
