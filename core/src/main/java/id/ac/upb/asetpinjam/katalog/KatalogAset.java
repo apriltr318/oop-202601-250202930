@@ -18,13 +18,26 @@ public class KatalogAset {
         return List.copyOf(daftar);
     }
 
-    /** TODO minggu 4: aset yang namanya memuat kata (tanpa membedakan huruf besar/kecil). */
-    public List<Aset> cari(String kata) {
-        throw new UnsupportedOperationException("TODO minggu 4: cari(String)");
-    }
+/**
+ * Mencari aset berdasarkan kata pada nama,
+ * tanpa membedakan huruf besar dan kecil.
+ */
+public List<Aset> cari(String kata) {
+    String kataKecil = kata.toLowerCase();
 
-    /** TODO minggu 4: seperti cari(kata) tetapi hanya untuk jenis yang diminta (overloading). */
-    public List<Aset> cari(String kata, JenisAset jenis) {
-        throw new UnsupportedOperationException("TODO minggu 4: cari(String, JenisAset)");
-    }
+    return daftar.stream()
+            .filter(aset -> aset.getNama()
+                    .toLowerCase()
+                    .contains(kataKecil))
+            .toList();
+}
+
+/**
+* Mencari aset berdasarkan kata dan jenis aset.
+ */
+public List<Aset> cari(String kata, JenisAset jenis) {
+    return cari(kata).stream()
+            .filter(aset -> aset.getJenis() == jenis)
+            .toList();
+}
 }
