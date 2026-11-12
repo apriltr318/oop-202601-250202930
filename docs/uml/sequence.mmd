@@ -1,0 +1,24 @@
+
+sequenceDiagram
+    autonumber
+
+    actor P as Peminjam
+    participant J as JadwalPeminjaman
+    participant B as Peminjaman baru
+    participant E as PeminjamanBentrokException
+
+    Note over P,E: Rancangan alur pengajuan peminjaman (method masih TODO)
+
+    P->>B: Membuat objek Peminjaman
+    P->>J: ajukan(B)
+    J->>J: bentrok(B)
+    J->>J: Periksa aset dan rentang waktu
+
+    alt Tidak terjadi bentrok
+        J->>J: tambah(B)
+        J-->>P: Pengajuan berhasil dicatat
+    else Terjadi bentrok
+        J->>E: Buat exception
+        E-->>P: PeminjamanBentrokException
+        Note over J,E: Pengajuan tidak ditambahkan ke jadwal
+    end

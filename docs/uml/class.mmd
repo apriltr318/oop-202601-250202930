@@ -1,0 +1,270 @@
+
+classDiagram
+direction TB
+
+namespace model {
+    class Aset {
+        <<abstract>>
+        -String kode
+        -String nama
+        -StatusAset status
+        -Kondisi kondisi
+        +Aset(String kode, String nama)
+        +String getKode()
+        +String getNama()
+        +StatusAset getStatus()
+        +Kondisi getKondisi()
+        +void setNama(String nama)
+        +void setStatus(StatusAset status)
+        +void setKondisi(Kondisi kondisi)
+        #String wajibIsi(String nilai, String namaField)$
+        +boolean bisaDipinjam()
+        +JenisAset getJenis()
+        +long hitungDenda(int hariTerlambat)*
+    }
+
+    class Ruang {
+        -int kapasitas
+        +Ruang(String kode, String nama, int kapasitas)
+        +int getKapasitas()
+        +JenisAset getJenis()
+        +long hitungDenda(int hariTerlambat)
+    }
+
+    class Laptop {
+        -String spesifikasi
+        -String nomorInventaris
+        +Laptop(String kode, String nama, String spesifikasi, String nomorInventaris)
+        +String getSpesifikasi()
+        +String getNomorInventaris()
+        +JenisAset getJenis()
+        +long hitungDenda(int hariTerlambat)
+    }
+
+    class AlatLab {
+        -String laboratorium
+        -TingkatRisiko tingkatRisiko
+        +AlatLab(String kode, String nama, String laboratorium, TingkatRisiko tingkatRisiko)
+        +String getLaboratorium()
+        +TingkatRisiko getTingkatRisiko()
+        +JenisAset getJenis()
+        +long hitungDenda(int hariTerlambat)
+    }
+
+    class Peminjam {
+        <<record>>
+        +String id
+        +String nama
+        +Peminjam(String id, String nama)
+    }
+
+    class Peminjaman {
+        -String id
+        -Peminjam peminjam
+        -Aset aset
+        -LocalDateTime mulai
+        -LocalDateTime selesai
+        -StatusPeminjaman status
+        +Peminjaman(String id, Peminjam peminjam, Aset aset, LocalDateTime mulai, LocalDateTime selesai)
+        +String getId()
+        +Peminjam getPeminjam()
+        +Aset getAset()
+        +LocalDateTime getMulai()
+        +LocalDateTime getSelesai()
+        +StatusPeminjaman getStatus()
+        +void setStatusDariPenyimpanan(StatusPeminjaman status)
+        +void ubahStatus(StatusPeminjaman baru)
+    }
+
+    class JenisAset {
+        <<enumeration>>
+        RUANG
+        LAPTOP
+        ALAT_LAB
+    }
+
+    class StatusAset {
+        <<enumeration>>
+        TERSEDIA
+        DIPINJAM
+        RUSAK
+    }
+
+    class Kondisi {
+        <<enumeration>>
+        BAIK
+        RUSAK_RINGAN
+        RUSAK_BERAT
+    }
+
+    class StatusPeminjaman {
+        <<enumeration>>
+        DIAJUKAN
+        DISETUJUI
+        DITOLAK
+        DIBATALKAN
+        DIPINJAM
+        TERLAMBAT
+        DIKEMBALIKAN
+    }
+
+    class TingkatRisiko {
+        <<enumeration>>
+        RENDAH
+        SEDANG
+        TINGGI
+    }
+}
+
+namespace kontrak {
+    class DapatDipinjam {
+        <<interface>>
+        +boolean bisaDipinjam()
+    }
+
+    class AturanDenda {
+        <<interface>>
+        +long hitung(Aset aset, int hariTerlambat)
+    }
+}
+
+namespace jadwal {
+    class JadwalPeminjaman {
+        -List~Peminjaman~ daftar
+        -int kuotaLaptop
+        +JadwalPeminjaman(int kuotaLaptop)
+        #int kuotaLaptop()
+        #List~Peminjaman~ daftarMutable()
+        +void tambah(Peminjaman p)
+        +boolean bentrok(Peminjaman baru)
+        +List~Peminjaman~ semuaUrutMulai()
+        +Map~String,List~Peminjaman~~ perAset()
+        +boolean hapus(String id)
+        +void ajukan(Peminjaman baru)
+    }
+}
+
+namespace katalog {
+    class KatalogAset {
+        -List~Aset~ daftar
+        +void tambah(Aset aset)
+        +List~Aset~ semua()
+        +List~Aset~ cari(String kata)
+        +List~Aset~ cari(String kata, JenisAset jenis)
+    }
+}
+
+namespace denda {
+    class DendaFlat {
+        +long hitung(Aset aset, int hariTerlambat)
+    }
+
+    class DendaProgresif {
+        +long hitung(Aset aset, int hariTerlambat)
+    }
+
+    class LayananDenda {
+        +LayananDenda(AturanDenda aturan)
+        +long hitung(Aset aset, int hariTerlambat)
+    }
+}
+
+namespace dao {
+    class AsetDAO {
+        <<interface>>
+        +void simpan(Aset aset)
+        +Optional~Aset~ cariByKode(String kode)
+        +List~Aset~ semua()
+        +void perbarui(Aset aset)
+        +boolean hapus(String kode)
+    }
+
+    class JdbcAsetDAO {
+        -Supplier~Connection~ sumberKoneksi
+        +JdbcAsetDAO(Supplier~Connection~ sumberKoneksi)
+        +void simpan(Aset aset)
+        +Optional~Aset~ cariByKode(String kode)
+        +List~Aset~ semua()
+        +void perbarui(Aset aset)
+        +boolean hapus(String kode)
+    }
+
+    class PeminjamanDAO {
+        <<interface>>
+        +void simpan(Peminjaman peminjaman)
+        +Optional~Peminjaman~ cariById(String id)
+        +boolean perbaruiStatus(String id, StatusPeminjaman status)
+    }
+
+    class JdbcPeminjamanDAO {
+        -Supplier~Connection~ sumberKoneksi
+        -AsetDAO asetDao
+        +JdbcPeminjamanDAO(Supplier~Connection~ sumberKoneksi, AsetDAO asetDao)
+        +void simpan(Peminjaman peminjaman)
+        +Optional~Peminjaman~ cariById(String id)
+        +boolean perbaruiStatus(String id, StatusPeminjaman status)
+    }
+
+    class Koneksi {
+        -Koneksi()
+        +Connection baru()$
+    }
+}
+
+namespace factory {
+    class AsetFactory {
+        -AsetFactory()
+        +Aset buat(JenisAset jenis, String kode, String nama, String... atribut)$
+    }
+}
+
+namespace config {
+    class Varian {
+        -int[] DENDA_PER_HARI$
+        -int[] BATAS_DURASI_JAM$
+        -int[] KUOTA_LAPTOP$
+        -Varian aktif$
+        +String nim
+        +String nama
+        +int dendaPerHari
+        +int batasDurasiJam
+        +int kuotaLaptop
+        -Varian(String nim, String nama)
+        +Varian dariNim(String nim, String nama)$
+        +Varian aktif()$
+    }
+}
+
+Aset <|-- Ruang
+Aset <|-- Laptop
+Aset <|-- AlatLab
+DapatDipinjam <|.. Aset
+
+AturanDenda <|.. DendaFlat
+AturanDenda <|.. DendaProgresif
+
+Aset "1" --> "0..*" KatalogAset : disimpan dalam
+Peminjaman "0..*" --> "1" Peminjam : dimiliki oleh
+Peminjaman "0..*" --> "1" Aset : menggunakan
+JadwalPeminjaman "1" --> "0..*" Peminjaman : menyimpan
+
+Aset --> JenisAset
+Aset --> StatusAset
+Aset --> Kondisi
+AlatLab --> TingkatRisiko
+Peminjaman --> StatusPeminjaman
+
+DendaFlat ..> Aset
+DendaProgresif ..> Aset
+LayananDenda ..> AturanDenda
+LayananDenda ..> Aset
+
+JdbcAsetDAO ..|> AsetDAO
+JdbcPeminjamanDAO ..|> PeminjamanDAO
+JdbcPeminjamanDAO --> AsetDAO : menggunakan
+JdbcPeminjamanDAO ..> Peminjaman
+JdbcAsetDAO ..> Aset
+
+AsetFactory ..> Aset : membuat
+AsetFactory ..> JenisAset
+Koneksi ..> Connection
