@@ -1,6 +1,12 @@
 package id.ac.upb.asetpinjam.mahasiswa;
 
-import org.junit.jupiter.api.Disabled;
+import static id.ac.upb.asetpinjam.TestSupport.pinjam;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import id.ac.upb.asetpinjam.TestSupport;
+import id.ac.upb.asetpinjam.jadwal.JadwalPeminjaman;
+import id.ac.upb.asetpinjam.model.Peminjaman;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -12,12 +18,23 @@ import org.junit.jupiter.api.Test;
  *
  * <p>Syarat minggu 10: folder ini memuat minimal 8 tes (tidak termasuk contoh bawaan ini).
  */
+
+@Tag("week7")
 class BatasBentrokTest {
 
     @Test
-    @Disabled("Isi dengan keputusan Anda tentang batas waktu bentrok")
     void selesaiSamaDenganMulai() {
-        // TODO: buat dua peminjaman pada aset yang sama, satu selesai tepat saat yang lain mulai,
-        // lalu nyatakan hasil yang Anda putuskan dengan assertThat(...).
+        JadwalPeminjaman jadwal = new JadwalPeminjaman(2);
+
+        var peminjam = TestSupport.peminjam("P1");
+        var aset = TestSupport.ruang("R-1");
+
+        // Peminjaman pertama berlangsung pukul 09.00 sampai 11.00.
+        jadwal.tambah(pinjam("1", peminjam, aset, 9, 11));
+
+        // Peminjaman kedua dimulai tepat pukul 11.00.
+        Peminjaman baru = pinjam("2", peminjam, aset, 11, 13);
+
+        assertThat(jadwal.bentrok(baru)).isFalse();
     }
 }

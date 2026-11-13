@@ -18,12 +18,12 @@ Format tiap entri:
 
 Salin setiap pertanyaan ambigu (nomor 1 sampai 7) ke sini dan jawab. Contoh:
 
-## A-01: batas waktu bentrok
-- Pertanyaan: 09:00-11:00 dan 11:00-13:00 pada aset yang sama bentrok atau tidak?
-- Keputusan: (isi)
-- Alasan: (isi)
-- Dampak ke kode: (isi)
-- Tes yang membuktikan: (isi)
+## A-01: Batas waktu bentrok
+- Pertanyaan: Apa definisi bentrok di batas waktu? Apakah peminjaman pukul 09:00–11:00 dan 11:00–13:00 pada aset yang sama dianggap bentrok?
+- Keputusan: Kedua peminjaman tidak dianggap bentrok karena waktu selesai peminjaman pertama sama dengan waktu mulai peminjaman berikutnya.
+- Alasan: Aset dapat langsung digunakan oleh peminjam berikutnya setelah peminjaman sebelumnya selesai.
+- Dampak ke kode: Metode `bentrok()` pada kelas `JadwalPeminjaman` menggunakan perbandingan waktu untuk memeriksa apakah dua jadwal saling tumpang tindih.
+- Tes yang membuktikan: `BatasBentrokTest.selesaiSamaDenganMulai()`.
 
 ## Asumsi lain
 
